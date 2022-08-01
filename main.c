@@ -13,6 +13,19 @@
 
 extern char** environ;
 
+static long tangles (void)
+{
+  long twisties = 40;
+#ifdef _SC_SYMLOOP_MAX
+  {
+    long loopies = sysconf(_SC_SYMLOOP_MAX);
+    if (loopies > 0)
+      twisties = loopies;
+  }
+#endif
+  return twisties;
+}
+
 static void chop_chop (const char* the_real_mcchoy, char** argv)
 {
   execve(the_real_mcchoy, argv, environ);
@@ -34,35 +47,66 @@ static void chop_chop (const char* the_real_mcchoy, char** argv)
 
 static char* dig_up (const char* cabbage)
 {
-  char* root = NULL;
+  char* roots = NULL;
   struct stat dirt;
   if (lstat(cabbage, &dirt) == 0 && dirt.st_size > 0) {
-    root = calloc(1, dirt.st_size + 1);
-    if (!root)
+    roots = calloc(1, dirt.st_size + 1);
+    if (!roots)
       return NULL;
-    if (readlink(cabbage, root, dirt.st_size + 1) > dirt.st_size) {
-      free(root);
+    if (readlink(cabbage, roots, dirt.st_size + 1) > dirt.st_size) {
+      free(roots);
       return dig_up(cabbage);
     }
   }
-  return root;
+  return roots;
 }
 
-static void chop_chop_chop (char* cabbage, char** argv)
+static int seems_suspicious (const char* aerial_roots)
 {
-  char* root = NULL;
+  if (!aerial_roots)
+    return 0;
+  const char* root = aerial_roots;
+  while (*root == '.')
+    root++;
+  return strncmp("choysh", root, strlen("choysh")) == 0;
+}
+
+static void chop_chop_chop (const char* cabbage, char** argv)
+{
+  char* the_real_mcchoy = NULL;
+  char* species = NULL;
   if (argv[0]) {
-    root = dig_up(cabbage);
-    argv[0] = basename(root ? root : cabbage);
+    long digs;
+    char* aerial_roots = NULL;
+    for (digs = 0; digs < tangles(); digs++) {
+      char* roots = dig_up(the_real_mcchoy ? the_real_mcchoy : cabbage);
+      if (!roots)
+        break;
+      free(the_real_mcchoy);
+      the_real_mcchoy = roots;
+      aerial_roots = basename(roots);
+      if (!seems_suspicious(aerial_roots))
+        break;
+    }
+    if (aerial_roots) {
+      if (*argv[0] == '-') {
+        species = calloc(1, strlen(aerial_roots) + 2);
+        species[0] = '-';
+        strcat(species, aerial_roots);
+        argv[0] = species;
+      } else
+        argv[0] = aerial_roots;
+    }
   }
-  chop_chop(cabbage, argv);
-  free(root);
+  chop_chop(the_real_mcchoy ? the_real_mcchoy : cabbage, argv);
+  free(the_real_mcchoy);
+  free(species);
 }
 
 static void maybe_drainage_ditch (char** argv)
 {
   if (argv[0])
-    argv[0] = "sh";
+    argv[0] = *argv[0] == '-' ? "-sh" : "sh";
   chop_chop("/bin/sh", argv);
 }
 
