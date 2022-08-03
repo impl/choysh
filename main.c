@@ -90,10 +90,12 @@ static void chop_chop_chop (const char* cabbage, char** argv)
     }
     if (aerial_roots) {
       if (*argv[0] == '-') {
-        species = calloc(1, strlen(aerial_roots) + 2);
-        species[0] = '-';
-        strcat(species, aerial_roots);
-        argv[0] = species;
+        species = malloc(strlen(aerial_roots) + 2);
+        if (species) {
+          species[0] = '-';
+          strcpy(species + 1, aerial_roots);
+          argv[0] = species;
+        }
       } else
         argv[0] = aerial_roots;
     }

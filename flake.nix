@@ -17,7 +17,7 @@
       packages.${system} = rec {
         choysh = with pkgs; stdenv.mkDerivation {
           pname = "choysh";
-          version = "1.0.1";
+          version = "1.0.2";
 
           src = ./.;
 
