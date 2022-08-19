@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 project('choysh', 'c',
-        version: '1.0.2',
+        version: '1.0.3',
         default_options: ['c_std=c11', 'warning_level=3', 'optimization=3'])
 add_project_arguments('-D_POSIX_C_SOURCE=200809L', language: 'c')
 executable('choysh', 'main.c', install: true)

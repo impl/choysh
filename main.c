@@ -65,10 +65,9 @@ static int seems_suspicious (const char* aerial_roots)
 {
   if (!aerial_roots)
     return 0;
-  const char* root = aerial_roots;
-  while (*root == '.')
-    root++;
-  return strncmp("choysh", root, strlen("choysh")) == 0;
+  while (*aerial_roots == '.')
+    aerial_roots++;
+  return strncmp("choysh", aerial_roots, strlen("choysh")) == 0;
 }
 
 static void chop_chop_chop (const char* cabbage, char** argv)
@@ -120,9 +119,10 @@ static void maybe_giant_farm (char** argv)
 static void maybe_cabbage_patch (char** argv)
 {
   const struct passwd* farmer = getpwuid(getuid());
+  char* baby_bok_choy;
   if (!farmer || !farmer->pw_dir)
     return;
-  char* baby_bok_choy = malloc(strlen(farmer->pw_dir) + strlen("/.choysh") + 1);
+  baby_bok_choy = malloc(strlen(farmer->pw_dir) + strlen("/.choysh") + 1);
   if (!baby_bok_choy)
     return;
   strcpy(baby_bok_choy, farmer->pw_dir);

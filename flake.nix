@@ -6,6 +6,13 @@
   outputs = { self, nixpkgs }: with nixpkgs.lib; let
     allSystems = builtins.map (system: let
       pkgs = nixpkgs.legacyPackages.${system};
+      version =
+        builtins.readFile (
+          pkgs.runCommandCC "choysh-version" { nativeBuildInputs = with pkgs; [ jq meson ninja ]; } ''
+            meson setup build ${./.}
+            meson introspect build --projectinfo | jq -j .version >$out
+          ''
+        );
     in {
       devShells.${system}.default = with pkgs; mkShell {
         nativeBuildInputs = [
@@ -17,7 +24,7 @@
       packages.${system} = rec {
         choysh = with pkgs; stdenv.mkDerivation {
           pname = "choysh";
-          version = "1.0.2";
+          inherit version;
 
           src = ./.;
 
