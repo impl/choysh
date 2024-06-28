@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Noah Fontes
+// SPDX-FileCopyrightText: 2022-2024 Noah Fontes
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -33,7 +33,9 @@ static void chop_chop (const char* the_real_mcchoy, char** argv)
   case EACCES:
   case EINVAL:
   case EISDIR:
+#ifdef ELIBBAD
   case ELIBBAD:
+#endif
   case ENOENT:
   case ENOEXEC:
   case ENOTDIR:
